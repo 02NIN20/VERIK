@@ -1,0 +1,25 @@
+/**
+ * VERIK design tokens — verde petróleo, slate, acentos de riesgo.
+ * Consumir desde apps/web: import "@verik/ui/tokens.css";
+ */
+:root {
+  --verik-color-primary: #0d3d3a;
+  --verik-color-primary-hover: #125a54;
+  --verik-color-secondary: #3d5a6b;
+  --verik-color-surface: #f4f7f8;
+  --verik-color-surface-elevated: #ffffff;
+  --verik-color-border: #d5dee3;
+  --verik-color-text: #0f172a;
+  --verik-color-text-muted: #64748b;
+  --verik-color-accent-ok: #16a34a;
+  --verik-color-accent-warn: #eab308;
+  --verik-color-accent-danger: #dc2626;
+  --verik-radius-sm: 6px;
+  --verik-radius-md: 10px;
+  --verik-font-sans: "Inter", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --verik-space-1: 4px;
+  --verik-space-2: 8px;
+  --verik-space-3: 12px;
+  --verik-space-4: 16px;
+  --verik-space-6: 24px;
+}

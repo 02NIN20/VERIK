@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id               String            @id @default(cuid())
+  name             String
+  slug             String            @unique
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  memberships      Membership[]
+  parties          Party[]
+  roles            Role[]
+  ruleVersions     RuleVersion[]
+  ruleEvaluations  RuleEvaluation[]
+  auditEvents      AuditEvent[]
+  adminQueryLogs   AdminQueryLog[]
+  consents         Consent[]
+}
+
+model User {
+  id                   String           @id @default(cuid())
+  email                String           @unique
+  passwordHash         String
+  isPlatformSuperAdmin Boolean          @default(false)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  memberships          Membership[]
+  auditEvents          AuditEvent[]     @relation("ActorAudit")
+  adminQueryLogs       AdminQueryLog[]
+}
+
+model Role {
+  id              String           @id @default(cuid())
+  tenantId        String
+  name            String
+  key             String
+  description     String?
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  memberships     Membership[]
+  rolePermissions RolePermission[]
+
+  @@unique([tenantId, key])
+  @@index([tenantId])
+}
+
+model Permission {
+  id              String           @id @default(cuid())
+  key             String           @unique
+  label           String?
+  rolePermissions RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  roleId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  role      Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([tenantId])
+}
+
+model Party {
+  id           String   @id @default(cuid())
+  tenantId     String
+  displayName  String
+  documentType String?
+  documentId   String?
+  riskLevel    String   @default("UNKNOWN")
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  consents     Consent[]
+
+  @@index([tenantId])
+  @@index([tenantId, displayName])
+}
+
+model AuditEvent {
+  id             String   @id @default(cuid())
+  tenantId       String
+  actorUserId    String?
+  action         String
+  resourceType   String
+  resourceId     String?
+  ip             String?
+  userAgent      String?
+  requestId      String?
+  payloadSummary Json?
+  diff           Json?
+  occurredAt     DateTime @default(now())
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  actor          User?    @relation("ActorAudit", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, occurredAt])
+  @@index([actorUserId, occurredAt])
+}
+
+model RuleVersion {
+  id              String           @id @default(cuid())
+  tenantId        String
+  version         Int
+  status          String           @default("draft")
+  definition      Json
+  createdAt       DateTime         @default(now())
+  createdByUserId String?
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  evaluations     RuleEvaluation[]
+
+  @@unique([tenantId, version])
+  @@index([tenantId, status])
+}
+
+model RuleEvaluation {
+  id            String      @id @default(cuid())
+  tenantId      String
+  ruleVersionId String
+  resourceType  String
+  resourceId    String
+  result        String
+  detail        Json?
+  evaluatedAt   DateTime    @default(now())
+  tenant        Tenant      @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ruleVersion   RuleVersion @relation(fields: [ruleVersionId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, evaluatedAt])
+  @@index([ruleVersionId])
+}
+
+model AdminQueryLog {
+  id          String   @id @default(cuid())
+  tenantId    String?
+  actorUserId String
+  command     String
+  params      Json?
+  rowCount    Int?
+  durationMs  Int?
+  createdAt   DateTime @default(now())
+  tenant      Tenant?  @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  actor       User     @relation(fields: [actorUserId], references: [id], onDelete: Cascade)
+
+  @@index([actorUserId, createdAt])
+}
+
+model Consent {
+  id         String    @id @default(cuid())
+  tenantId   String
+  partyId    String?
+  purpose    String
+  status     String    @default("active")
+  validFrom  DateTime  @default(now())
+  validUntil DateTime?
+  metadata   Json?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  tenant     Tenant    @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  party      Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId])
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@verik/ui",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "echo \"CSS tokens only\"",
+    "lint": "echo \"no lint yet\"",
+    "test": "echo \"no tests yet\""
+  },
+  "exports": {
+    "./tokens.css": "./src/tokens.css"
+  }
+}
