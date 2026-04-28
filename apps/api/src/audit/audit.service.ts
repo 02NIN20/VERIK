@@ -3,15 +3,15 @@ import { PrismaService } from "../prisma/prisma.service";
 
 export interface AuditParams {
   tenantId: string;
-  actorUserId: string | null;
+  actorUserId: string;
   action: string;
   resourceType: string;
-  resourceId?: string | null;
-  ip?: string | null;
-  userAgent?: string | null;
-  requestId?: string | null;
-  payloadSummary?: Record<string, unknown> | null;
-  diff?: Record<string, unknown> | null;
+  resourceId?: string;
+  ip?: string;
+  userAgent?: string;
+  requestId?: string;
+  payloadSummary?: Record<string, unknown>;
+  diff?: Record<string, unknown>;
 }
 
 @Injectable()
@@ -22,15 +22,15 @@ export class AuditService {
     await this.prisma.auditEvent.create({
       data: {
         tenantId: params.tenantId,
-        actorUserId: params.actorUserId ?? undefined,
+        actorUserId: params.actorUserId,
         action: params.action,
         resourceType: params.resourceType,
-        resourceId: params.resourceId ?? undefined,
-        ip: params.ip ?? undefined,
-        userAgent: params.userAgent ?? undefined,
-        requestId: params.requestId ?? undefined,
-        payloadSummary: params.payloadSummary ?? undefined,
-        diff: params.diff ?? undefined,
+        resourceId: params.resourceId,
+        ip: params.ip,
+        userAgent: params.userAgent,
+        requestId: params.requestId,
+        payloadSummary: params.payloadSummary,
+        diff: params.diff,
       },
     });
   }

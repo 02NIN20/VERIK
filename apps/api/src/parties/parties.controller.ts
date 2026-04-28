@@ -37,12 +37,14 @@ export class PartiesController {
     @Headers("x-request-id") requestId?: string,
   ) {
     const ip = req.ip;
-    const userAgent = req.headers["user-agent"] ?? undefined;
+    const userAgent = Array.isArray(req.headers["user-agent"])
+      ? req.headers["user-agent"][0]
+      : req.headers["user-agent"];
     return this.parties.create(tenantId, dto, {
       actorUserId: user.sub,
-      ip: ip ?? undefined,
-      userAgent: typeof userAgent === "string" ? userAgent : undefined,
-      requestId: requestId ?? undefined,
+      ip,
+      userAgent,
+      requestId,
     });
   }
 }

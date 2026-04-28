@@ -55,9 +55,9 @@ export class PartiesService {
       action: "party.create",
       resourceType: "Party",
       resourceId: party.id,
-      ip: ctx.ip ?? null,
-      userAgent: ctx.userAgent ?? null,
-      requestId: ctx.requestId ?? null,
+      ip: ctx.ip,
+      userAgent: ctx.userAgent,
+      requestId: ctx.requestId,
       payloadSummary: { displayName: party.displayName },
     });
     return party;
