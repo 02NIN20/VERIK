@@ -16,7 +16,7 @@ Plataforma **RegTech B2B** de cumplimiento y monitoreo (multi-tenant): **API Nes
 ```bash
 cp .env.example .env
 # Ajustar JWT_SECRET y DATABASE_URL si hace falta
-
+# Waos
 docker compose up -d postgres
 pnpm install
 pnpm db:migrate
